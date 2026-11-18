@@ -1,0 +1,361 @@
+report 55036 "WDC Cash Payments"
+{
+    DefaultLayout = RDLC;
+    RDLCLayout = './.vscode/src_Paie/Report/RDLC/Paiementespèces.rdlc';
+    captionML = ENU = 'Cash Payments', FRA = 'Paiement espèces';
+    dataset
+    {
+        dataitem("Company Information"; "Company Information")
+        {
+            DataItemTableView = SORTING("Primary Key")
+                                ORDER(Ascending);
+            column(Fait_le_______FORMAT_WORKDATE_0_4_; 'Fait le : ' + FORMAT(WORKDATE, 0, 4))
+            {
+            }
+            column(CurrReport_PAGENO; '')
+            {
+            }
+            column(Page__Caption; 'Page')
+            {
+            }
+            column(Company_Information_Primary_Key; "Primary Key")
+            {
+            }
+            column(NomBanque; NomBanque)
+            {
+            }
+            column(RibBanque; RibBanque)
+            {
+            }
+            column(TexteBanque; TexteBanque)
+            {
+            }
+            column(NomCompany; "Company Information".Name)
+            {
+            }
+            column(AdresseCompany; "Company Information".Address)
+            {
+            }
+            column("TélCompany"; "Company Information"."Phone No.")
+            {
+            }
+            column(FaxCompany; "Company Information"."Fax No.")
+            {
+            }
+            column(Registredecommerce; "Company Information"."Trade Register")
+            {
+            }
+            column(MatriculeFiscal; "Company Information"."VAT Registration No.")
+            {
+            }
+            column("NuméroPaie"; Description)
+            {
+            }
+            dataitem("Salary Header"; "WDC Salary Header")
+            {
+                RequestFilterFields = "No.";
+                column(Salary_Headers_Description; Description)
+                {
+                }
+                column(comptebq_Name; comptebq.Name)
+                {
+                }
+                column(Ordre_de_virementCaption; Ordre_de_virementCaptionLbl)
+                {
+                }
+                column(MotifCaption; MotifCaptionLbl)
+                {
+                }
+                column(Destinataire____Caption; Destinataire____CaptionLbl)
+                {
+                }
+                column(Salary_Headers_No_; "No.")
+                {
+                }
+                column(TotalCashed; NetCashed)
+                {
+                }
+                column("Arrêté_le_présent_virement_à_la_somme_de______TextGMnt"; 'Arrêté le présent ordre de paiement espèces à la somme de : ' + TextGMnt)
+                {
+                    // DecimalPlaces = 3 : 3;
+                }
+                dataitem("Salary Lines"; "WDC Salary Lines")
+                {
+                    DataItemLink = "No." = FIELD("No.");
+                    DataItemTableView = SORTING("No.", "Employee No.")
+                                        ORDER(Ascending)
+                                        WHERE("Net salary cashed" = FILTER(<> 0),
+                                              "Payment Method Code" = FILTER(<> 'Virement'));
+                    RequestFilterFields = "Employee No.";
+                    column(text1; text1)
+                    {
+                    }
+                    column(CurrReport_PAGENO_Control1102752000; '')
+                    {
+                    }
+                    column(CurrReport_PAGENO_Control1102752006; '')
+                    {
+                    }
+                    column(Salary_Lines_Description; Description)
+                    {
+                    }
+                    column(total; total)
+                    {
+                        //DecimalPlaces = 3 : 3;
+                    }
+                    column(total_Control1102752009; total)
+                    {
+                        //DecimalPlaces = 3 : 3;
+                    }
+                    column(total_Control1102752015; total)
+                    {
+                        // DecimalPlaces = 3 : 3;
+                    }
+                    column(Page__Caption_Control1102752005; Page__Caption_Control1102752005Lbl)
+                    {
+                    }
+                    column(Page__Caption_Control1102752007; Page__Caption_Control1102752007Lbl)
+                    {
+                    }
+                    column(Salary_Lines_DescriptionCaption; FIELDCAPTION(Description))
+                    {
+                    }
+                    column(MontantCaption; MontantCaptionLbl)
+                    {
+                    }
+                    column(STRSUBSTNO___1_2_3_4___Bank_Branch_No____Agency_Code___Bank_Account_No____RIB_Key__Caption; STRSUBSTNO___1_2_3_4___Bank_Branch_No____Agency_Code___Bank_Account_No____RIB_Key__CaptionLbl)
+                    {
+                    }
+                    column("Nom___PrénomCaption"; Nom___PrénomCaptionLbl)
+                    {
+                    }
+                    column(MatriculeCaption; MatriculeCaptionLbl)
+                    {
+                    }
+                    column(Banque_AgenceCaption; Banque_AgenceCaptionLbl)
+                    {
+                    }
+                    column(ReportCaption; ReportCaptionLbl)
+                    {
+                    }
+                    column(Total_pageCaption; Total_pageCaptionLbl)
+                    {
+                    }
+                    column("Signature_autorisée_Caption"; Signature_autorisée_CaptionLbl)
+                    {
+                    }
+                    column("Montant_total_à_virerCaption"; Montant_total_à_virerCaptionLbl)
+                    {
+                    }
+                    column(Salary_Lines_No_; "No.")
+                    {
+                    }
+                    column(Salary_Lines_Employee; "Employee No.")
+                    {
+                    }
+                    column(Salary_Lines_Bank_Account_Code; "Bank Account Code")
+                    {
+                    }
+                    column(RIBsalar; "Salary RIB")
+                    {
+                    }
+                    column(Salary_Name; Name)
+                    {
+                    }
+                    column(Salary_NetCashed; "Net salary cashed")
+                    {
+                    }
+
+                    trigger OnAfterGetRecord()
+                    begin
+                        //>>
+                        IF ExportVirement THEN BEGIN
+                            RecGEmploy.GET("Employee No.");
+                            DetailLine := '02';                                                             // Code de l'enregistremeent
+                            DetailLine := DetailLine + COPYSTR(RecGEmploy."Bank Account Number", 1, 2);                         // Code Banque Employee
+                            DetailLine := DetailLine + comptebq."Bank Account No.";                         // RIB Société
+                            DetailLine := DetailLine + RecGEmploy."Bank Account Number";                                      // RIB Employee
+                            DetailLine := DetailLine + PADSTR('', 20, ' ');                                   // Ref envoie
+
+                            DetailLine := DetailLine + PADSTR("Salary Header".Description, 50);                    // Lib                          50       64-113
+                            DetailLine := DetailLine + IntLen(DecToString("Net salary cashed", 1), 10);               // Montant du virement          10       114-123
+                            DetailLine := DetailLine + PADSTR('', 2, ' ');                                    // Motif de rejet               2        124-125
+                            DetailLine := DetailLine + PADSTR('', 34, '0');                                   // Zone inutilisée              34       126-160
+                            OutStream.WRITE(DetailLine);
+                            NumOrdre := NumOrdre + 1;
+                        END;
+                        //<<
+                    end;
+
+                    trigger OnPreDataItem()
+                    begin
+                        //>>
+                        NumOrdre := 1;
+
+                        IF ExportVirement THEN BEGIN
+                            DetailLine := '09';                                                             // Code de l'enregistremeent
+                            DetailLine := DetailLine + '12';                                                // Code Banque
+                            DetailLine := DetailLine + comptebq."Bank Account No.";                           // RIB Société
+                            DetailLine := DetailLine + FORMAT(TODAY, 0, '<Year4><Month,2><Day,2>');           // Date d'échéance
+                            DetailLine := DetailLine + PADSTR('', 20, ' ');                                   // Ref envoie
+                            DetailLine := DetailLine + PADSTR('', 15, ' ');                                   // Code du registre
+                            DetailLine := DetailLine + IntLen(FORMAT("Salary Lines".COUNT), 10);           // Nbr Ligne
+                            CalcTot("Salary Header"."No.");
+                            DetailLine := DetailLine + IntLen(DecToString(MntTot, 1), 12);                     // Total Vir
+                            DetailLine := DetailLine + PADSTR('', 20, ' ');                                   // Contrepartie
+                            DetailLine := DetailLine + PADSTR('', 51, '0');                                   // Zone inutilisée
+                            OutStream.WRITE(DetailLine);
+                        END;
+                        //<<
+                    end;
+                }
+
+                trigger OnAfterGetRecord()
+                begin
+                    CLEAR(RecL);
+                    RecL.SETRANGE("No.", "No.");
+                    RecL.SETFILTER("Net salary cashed", '<>%1', 0);
+                    RecL.SETFILTER("Payment Method Code", '<>Virement');
+                    IF RecL.FINDSET THEN
+                        REPEAT
+                            NetCashed += RecL."Net salary cashed";
+                        UNTIL RecL.NEXT = 0;
+                    TextGMnt := '';
+                    Convert."Montant en texte"(TextGMnt, NetCashed);
+                end;
+            }
+
+            trigger OnAfterGetRecord()
+            begin
+                total := 0;
+                test := FALSE;
+                CLEAR(Description);
+                IF RecH.GET("Salary Header".GETFILTER("No.")) THEN
+                    Description := RecH.Description;
+            end;
+        }
+    }
+
+
+
+    trigger OnPreReport()
+    var
+        lText001: TextConst ENU = 'You have to choose a payroll journal',
+                            FRA = 'Vous devez choisir un journal de paie';
+    begin
+        IF ExportVirement THEN
+            IF CONFIRM(TextConf, FALSE) THEN BEGIN
+                TempBlob.CreateOutStream(OutStream);
+            END
+            ELSE
+                ExportVirement := FALSE;
+        IF "Salary Header".GETFILTER("No.") = '' THEN
+            ERROR(lText001);
+    end;
+
+    trigger OnPostReport()
+    begin
+        IF ExportVirement THEN BEGIN
+            TempBlob.CreateInStream(NewStream);
+            ToFile := 'Fdetvir.txt';
+            ReturnValue := DOWNLOADFROMSTREAM(
+                      NewStream,
+                      'Save File to RoleTailored Client',
+                      '',
+                      'Text File *.txt| *.txt',
+                      ToFile);
+            MESSAGE(FORMAT(ToFile));
+        END;
+    end;
+
+    var
+        total: Decimal;
+        test: Boolean;
+        text1: Text[300];
+        Convert: Codeunit 55028;
+        bcode: Code[50];
+        btext: Text[30];
+        comptebq: Record 270;
+        Text3: Text[50];
+        TextGMnt: Text[250];
+        Ordre_de_virementCaptionLbl: Label 'Paiement espèces';
+        MotifCaptionLbl: Label 'Motif';
+        Destinataire____CaptionLbl: Label 'Destinataire  : ';
+        Page__Caption_Control1102752005Lbl: Label 'Page :';
+        Page__Caption_Control1102752007Lbl: Label 'Page :';
+        MontantCaptionLbl: Label 'Montant';
+        STRSUBSTNO___1_2_3_4___Bank_Branch_No____Agency_Code___Bank_Account_No____RIB_Key__CaptionLbl: Label 'Bank Account';
+        "Nom___PrénomCaptionLbl": Label 'Nom & Prénom';
+        MatriculeCaptionLbl: Label 'Matricule';
+        Banque_AgenceCaptionLbl: Label 'Banque/Agence';
+        ReportCaptionLbl: Label 'Report';
+        Total_pageCaptionLbl: Label 'Total page';
+        "Signature_autorisée_CaptionLbl": Label 'Signature autorisée ';
+        "Montant_total_à_virerCaptionLbl": Label '<Montant total >';
+        NomBanque: Code[50];
+        RibBanque: Code[20];
+        TexteBanque: Code[60];
+        ExportVirement: Boolean;
+        DetailLine: Text[289];
+        sepMil: Text[1];
+        MntTot: Decimal;
+        TextConf: Label 'Avez vous insérer une disquette dans le lecteur A:';
+        RecGEmploy: Record Employee;
+        NumOrdre: Integer;
+        UibBanking: Boolean;
+        RecH: Record 55024;
+        Description: Text;
+        NetCashed: Decimal;
+        RecL: Record "WDC Salary Lines";
+        TempBlob: Codeunit "Temp Blob";
+        OutStream: OutStream;
+        NewStream: InStream;
+        ToFile: Variant;
+        ReturnValue: Boolean;
+
+
+    procedure DecToString(dec: Decimal; type: Integer): Text[250]
+    var
+        Str: Text[250];
+    begin
+        IF type = 0 THEN            // Conversion integer
+         BEGIN
+            Str := FORMAT(dec, 0, '<Integer>');
+        END
+        ELSE                        // Other
+         BEGIN
+            dec := dec * 1000;
+            Str := FORMAT(dec, 0, '<Integer>');
+        END;
+
+        Str := DELCHR(Str, '=', sepMil);
+        EXIT(Str);
+    end;
+
+
+    procedure IntLen(IntText: Text[60]; Len: Integer): Text[60]
+    begin
+        REPEAT
+            IF STRLEN(IntText) < Len THEN
+                IntText := '0' + IntText;
+        UNTIL STRLEN(IntText) = Len;
+        EXIT(IntText);
+    end;
+
+
+    procedure CalcTot(PaieNo: Code[20])
+    var
+        RecLignePaie: Record "WDC Salary Lines";
+    begin
+        MntTot := 0;
+        RecLignePaie.RESET;
+        RecLignePaie.SETRANGE("No.", PaieNo);
+        RecLignePaie.SETRANGE("Payment Method Code", 'Virement');
+        IF RecLignePaie.FINDSET THEN BEGIN
+            REPEAT
+                MntTot += RecLignePaie."Net Salary cashed";
+            UNTIL RecLignePaie.NEXT = 0;
+        END;
+    end;
+}
+
